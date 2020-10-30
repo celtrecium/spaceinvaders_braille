@@ -1,5 +1,6 @@
 # Space Invaders with Braille font
 Version of my text-based Space Invaders with Braille font textures
+ASCII original version: https://github.com/celtrecium/spaceinvaders
 
 # Build
 Run `make` command
