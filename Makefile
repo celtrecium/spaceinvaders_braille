@@ -1,10 +1,10 @@
 CC=gcc
-CFLAGS=-Iinclude -pedantic -Wall -Wextra -Wsign-conversion -Wconversion -Wshadow -ansi
+CFLAGS=-Iinclude -pedantic -Wall -Wextra -Wsign-conversion -Wconversion -Wshadow -ansi -O0
 OBJS=codl.o main.o si_engine.o si_game.o si_main.o
 SRC=src
 TEXTURES=textures
 
-all: options codl.o main.o si_engine.o si_game.o si_main.o invaders
+all: options prepare codl.o main.o si_engine.o si_game.o si_main.o invaders
 
 options:
 	@echo Space Invaders build options:
@@ -14,6 +14,11 @@ options:
 
 clean:
 	rm -rf invaders
+
+prepare:
+	mkdir -p include
+	[ -f ${SRC}/codl.c ] || curl https://raw.githubusercontent.com/celtrecium/codl/master/codl.c -o ${SRC}/codl.c
+	[ -f include/codl.h ] || curl https://raw.githubusercontent.com/celtrecium/codl/master/codl.h -o include/codl.h
 
 codl.o: ${SRC}/codl.c
 	${CC} ${CFLAGS} -c $^
