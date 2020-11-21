@@ -22,7 +22,7 @@ typedef struct game_object {
 	SENG_SWITCH collision;
 	SENG_SWITCH self_destroy;
 	int direction;
-	codl_window texture;
+	codl_window *texture;
 	struct game_object **enemy_objs;
 	int val_enemys;
 	int speed;

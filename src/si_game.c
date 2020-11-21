@@ -8,7 +8,7 @@ int init_invaders(invaders *invstrct, player_struct *plr, int vert_val, int hor_
 
 	seng_create_object(&invstrct->bullet, 0, 0, 1, 1, 1, 1, SENG_DISABLE, SENG_ENABLE, 5);
 	seng_load_texture(&invstrct->bullet, bllt_texture);
-	codl_set_window_visible(&invstrct->bullet.texture, CODL_DISABLE);
+	codl_set_window_visible(invstrct->bullet.texture, CODL_DISABLE);
 	invstrct->bullet.direction = 4;
 	invstrct->bullet.dead = 1;
 
@@ -51,7 +51,7 @@ int init_player(player_struct *plrs, int t_width, int t_height, int f_width, int
 	seng_load_texture(&plrs->bullet, bllt_texture);
 	plrs->bullet.direction = 3;
 	plrs->bullet.dead = 1;
-	codl_set_window_visible(&plrs->bullet.texture, CODL_DISABLE);
+	codl_set_window_visible(plrs->bullet.texture, CODL_DISABLE);
 	
 	return(1);
 }
@@ -126,7 +126,7 @@ int spawn_invader_bullet(invaders *invs) {
 			invs->bullet.health = 1;
 			invs->bullet.pos_x = invs->invaders[value].pos_x + invs->invaders[value].hitbox_width / 2;
 			invs->bullet.pos_y = invs->invaders[value].pos_y + invs->invaders[value].hitbox_height;
-			codl_set_window_visible(&invs->bullet.texture, CODL_ENABLE);
+			codl_set_window_visible(invs->bullet.texture, CODL_ENABLE);
 			seng_render();
 
 			return(1);
@@ -157,7 +157,7 @@ int control_player(player_struct *plrs, char ch) {
 				plrs->bullet.health     = 1;
 				plrs->bullet.pos_x = plrs->player.pos_x + plrs->player.hitbox_width / 2;
 				plrs->bullet.pos_y = plrs->player.pos_y;
-				codl_set_window_visible(&plrs->bullet.texture, CODL_ENABLE);
+				codl_set_window_visible(plrs->bullet.texture, CODL_ENABLE);
 				seng_render();
 			}
 
@@ -171,5 +171,5 @@ int control_player(player_struct *plrs, char ch) {
 
 void set_bullet_dead(game_object *gobj) {
 	gobj->dead = 1;
-	codl_set_window_visible(&gobj->texture, CODL_DISABLE);
+	codl_set_window_visible(gobj->texture, CODL_DISABLE);
 }

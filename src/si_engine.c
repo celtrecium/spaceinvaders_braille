@@ -1,8 +1,7 @@
 #include "si_engine.h"
 
 static obj_list intern_list;
-static codl_window game_window;
-static codl_windows_list game_windows_list;
+static codl_window *game_window;
 static int game_counter = 0;
 static int __seng_check_next_pos(game_object *gobj, int x_add, int y_add);
 
@@ -17,10 +16,10 @@ void game_interrupt(unsigned int num) {
 
 int seng_term_resize_check(void) {
 	if(codl_resize_term()) {
-		codl_change_window_position(&game_window, &game_windows_list, 
-			(codl_get_term()->width  / 2) - game_window.width / 2, 
-			(codl_get_term()->height / 2) - game_window.height / 2);
-		codl_display(&game_windows_list);
+		codl_change_window_position(game_window, 
+			(codl_get_term()->width  / 2) - game_window->width / 2, 
+			(codl_get_term()->height / 2) - game_window->height / 2);
+		codl_display();
 
 		return(1);
 	}
@@ -33,12 +32,11 @@ int seng_init(int width, int height) {
 	codl_cursor_mode(CODL_HIDE);
 	codl_noecho();
 
-	codl_create_windows_list(&game_windows_list);
-	if(!codl_create_window(&game_window, codl_get_term(), &game_windows_list, 0, codl_get_term()->width / 2 - width / 2, 
-			codl_get_term()->height / 2 - height / 2, width, height)) return(0);
+	game_window = codl_create_window(codl_get_term(), 0, codl_get_term()->width / 2 - width / 2, 
+			codl_get_term()->height / 2 - height / 2, width, height);
 
-	codl_set_colour(&game_window, 6, 256);
-	codl_rectangle(&game_window, 0, 0, width, height, " ");
+	codl_set_colour(game_window, 6, 256);
+	codl_rectangle(game_window, 0, 0, width, height, " ");
 
 	intern_list.size = 0;
 
@@ -48,7 +46,6 @@ int seng_init(int width, int height) {
 int seng_end() {
 	int count = 0;
 	
-	codl_clear_by_list(&game_windows_list);
 	if(intern_list.list) {
 		for(count = 0; count < intern_list.size; ++count) {
 			if(intern_list.list[count]->enemy_objs) {
@@ -84,11 +81,10 @@ int seng_create_object(game_object *gobj, int pos_x, int pos_y, int width, int h
 	gobj->update        = 0;
 	gobj->dead          = 0;
 
-	if(!codl_create_window(&gobj->texture, &game_window, &game_windows_list, game_windows_list.size + 1, pos_x, pos_y, width, height))
-		return(0);
-	codl_set_colour(&gobj->texture, 14, 256);
-	codl_rectangle(&gobj->texture, 0, 0, width, height, " ");
-	codl_set_alpha(&gobj->texture, CODL_ENABLE);
+	gobj->texture = codl_create_window(game_window, intern_list.size + 1, pos_x, pos_y, width, height);
+	codl_set_colour(gobj->texture, 14, 256);
+	codl_rectangle(gobj->texture, 0, 0, width, height, " ");
+	codl_set_alpha(gobj->texture, CODL_ENABLE);
 
 	++intern_list.size;
 	if(!intern_list.list) {
@@ -104,11 +100,11 @@ int seng_create_object(game_object *gobj, int pos_x, int pos_y, int width, int h
 
 int seng_terminate_object(game_object *gobj) {
 	int count = 0;
-	int curr_obj;
+	int curr_obj = 0;
 
 	if(gobj->dead) return(0);
 
-	codl_terminate_window(&gobj->texture, &game_windows_list);
+	codl_terminate_window(gobj->texture);
 	
 	if(gobj->enemy_objs) {
 		free(gobj->enemy_objs);
@@ -154,12 +150,12 @@ static int __seng_check_next_pos(game_object *gobj, int x_add, int y_add) {
 					ptr->health -= gobj->damage;
 
 					if(ptr->health <= 0) {
-						codl_set_window_visible(&ptr->texture, CODL_DISABLE);
+						codl_set_window_visible(ptr->texture, CODL_DISABLE);
 						ptr->dead = 1;
 					}
 
 					if(gobj->self_destroy) {
-						codl_set_window_visible(&gobj->texture, CODL_DISABLE);
+						codl_set_window_visible(gobj->texture, CODL_DISABLE);
 						gobj->health = 0;
 						gobj->dead = 1;
 					}
@@ -180,8 +176,8 @@ int seng_set_obj_position(game_object *gobj, int x_add, int y_add) {
 		gobj->pos_x += x_add;
 		gobj->pos_y += y_add;
 
-		codl_change_window_position(&gobj->texture,
-			&game_windows_list, gobj->pos_x, gobj->pos_y);
+		codl_change_window_position(gobj->texture,
+			gobj->pos_x, gobj->pos_y);
 	}
 
 	return(1);
@@ -209,20 +205,20 @@ int seng_obj_move(game_object *gobj) {
 }
 
 int seng_render() {
-	if(!codl_display(&game_windows_list)) return(0);
+	if(!codl_display()) return(0);
 
 	return(1);
 }
 
 int seng_load_texture(game_object *gobj, char *texture_file_name) {
-	codl_window_clear(&gobj->texture);
-	if(!codl_load_buffer_from_file(&gobj->texture, texture_file_name, 0, 0)) return(0);
+	codl_window_clear(gobj->texture);
+	if(!codl_load_buffer_from_file(gobj->texture, texture_file_name, 0, 0)) return(0);
 
 	return(1);
 }
 
 int seng_load_background(char *filename) {
-	if(!codl_load_buffer_from_file(&game_window, filename, 0, 0)) return(0);
+	if(!codl_load_buffer_from_file(game_window, filename, 0, 0)) return(0);
 
 	return(1);
 }
@@ -266,6 +262,6 @@ int seng_get_game_counter(void) {
 }
 
 codl_window *seng_get_window(void) {
-	return(&game_window);
+	return(game_window);
 }
 
