@@ -91,7 +91,7 @@ int seng_create_object(game_object *gobj, int pos_x, int pos_y, int width, int h
 		intern_list.list = codl_malloc_check((int)sizeof(game_object*));
 		intern_list.list[intern_list.size - 1] = gobj;
 	} else {
-		intern_list.list = codl_realloc_check(intern_list.list, intern_list.size * (int)sizeof(game_object*));
+		intern_list.list = codl_realloc_check(intern_list.list, (size_t)intern_list.size * sizeof(game_object*));
 		intern_list.list[intern_list.size - 1] = gobj;
 	}
 
@@ -123,7 +123,7 @@ int seng_terminate_object(game_object *gobj) {
 
 	--intern_list.size;
 	if(intern_list.size) {
-		intern_list.list = codl_realloc_check(intern_list.list, intern_list.size * (int)sizeof(game_object*));
+		intern_list.list = codl_realloc_check(intern_list.list, (size_t)intern_list.size * sizeof(game_object*));
 	} else {
 		free(intern_list.list);
 	}
@@ -229,7 +229,7 @@ int seng_set_obj_enemy(game_object *gobj, game_object *enemy) {
 	if(!gobj->enemy_objs) {
 		gobj->enemy_objs = codl_malloc_check((int)sizeof(game_object*));
 	} else {
-		gobj->enemy_objs = codl_realloc_check(gobj->enemy_objs, gobj->val_enemys * (int)sizeof(game_object*));
+		gobj->enemy_objs = codl_realloc_check(gobj->enemy_objs, (size_t)gobj->val_enemys * sizeof(game_object*));
 	}
 
 	gobj->enemy_objs[gobj->val_enemys - 1] = enemy;

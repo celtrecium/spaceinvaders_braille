@@ -43,10 +43,13 @@ void init_game(si_struct *si, int f_width, int f_height) {
 int loop_game(si_struct *si) {
 	int end = 0;
 	int count;
+	unsigned int key = 0;
 	const int INVS_VAL = si->invs.horizontal_val * si->invs.vertical_val;
 
 	for(;;) {
 		game_interrupt(10000000);
+
+		key = codl_get_key();
 
 		seng_term_resize_check();
 		if(!(seng_get_game_counter() % 60) && !si->plrs.player.dead) {
@@ -54,8 +57,8 @@ int loop_game(si_struct *si) {
 			seng_render();
 		}
 
-		if(codl_kbhit()) {
-			if(!control_player(&si->plrs, (char)fgetc(stdin))) break;
+		if(key) {
+			if(!control_player(&si->plrs, key)) break;
 			seng_render();
 		}
 

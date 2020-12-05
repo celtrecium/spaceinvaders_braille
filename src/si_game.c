@@ -21,7 +21,7 @@ int init_invaders(invaders *invstrct, player_struct *plr, int vert_val, int hor_
 	invstrct->direction         = 1;
 	invstrct->counter_moves_fwd = 0;
 
-	invstrct->invaders = codl_malloc_check(hor_val * vert_val * (int)sizeof(game_object));
+	invstrct->invaders = codl_malloc_check((size_t)(hor_val * vert_val) * sizeof(game_object));
 
 	for(count = 0; count < vert_val; ++count) {
 		for(count_1 = 0; count_1 < hor_val; ++count_1) {
@@ -60,7 +60,7 @@ int init_shields(shields_struct *shlds, player_struct *plrs, invaders *invs, int
 		int num, int t_width, int t_heigth, char *texture) {
 	int count;
 
-	shlds->shields = codl_malloc_check(num * (int)sizeof(game_object));
+	shlds->shields = codl_malloc_check((size_t)num * sizeof(game_object));
 
 	for(count = 0; count < num; ++count) {
 		seng_create_object(&shlds->shields[count], count * ((f_width - (num * t_width)) / (num - 1) + t_width),
@@ -136,21 +136,21 @@ int spawn_invader_bullet(invaders *invs) {
 	return(0);
 }
 
-int control_player(player_struct *plrs, char ch) {
+int control_player(player_struct *plrs, unsigned int ch) {
 	switch(ch) {
-		case RIGHT: /* RIGHT */
+		case CODL_KEY_RIGHT: /* RIGHT */
 			if((plrs->player.pos_x + plrs->player.hitbox_width) < seng_get_window()->width) {
 				seng_set_obj_position(&plrs->player, 1, 0);
 			}
 
 			break;
-		case LEFT: /* LEFT */
+		case CODL_KEY_LEFT: /* LEFT */
 			if(plrs->player.pos_x > 0) {
 				seng_set_obj_position(&plrs->player, -1, 0);
 			}
 
 			break;
-		case ' ':
+		case CODL_KEY_SPACE:
 			if(plrs->bullet.dead) {
 				plrs->bullet.direction  = 3;
 				plrs->bullet.dead       = 0;
@@ -162,7 +162,8 @@ int control_player(player_struct *plrs, char ch) {
 			}
 
 			break;
-		case 'q':
+		case CODL_KEY_LC_Q:
+		case CODL_KEY_UC_Q:
 			return(0);
 	}
 

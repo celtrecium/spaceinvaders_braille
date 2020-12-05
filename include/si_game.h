@@ -38,7 +38,7 @@ int init_shields(shields_struct *shlds, player_struct *plrs, invaders *invs, int
 		int num, int t_width, int t_heigth, char *texture);
 int move_invaders(invaders *invs, int f_height);
 int spawn_invader_bullet(invaders *invs);
-int control_player(player_struct *plrs, char ch);
+int control_player(player_struct *plrs, unsigned int ch);
 void set_bullet_dead(game_object *gobj);
 
 #endif /* SI_GAME_H */
